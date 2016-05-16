@@ -20,7 +20,7 @@ type Pool interface {
 type myPool struct {
   total uint32
   eType reflect.Type
-  genEntity func() Entity
+  genEntity func() Entity  // 生成实现entity接口对象的func
   container chan Entity
   idContainer map[uint32]bool
   mutex sync.Mutex
