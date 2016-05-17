@@ -58,18 +58,18 @@ func (this *Scheduler) startDownloading() {
 func (this *Scheduler) download(request base.Request) {
   fmt.Println("in download method")
   downloader, err := this.downloaderPool.Take()
-  fmt.Println("+++++++++++ 000000000000")
   defer this.downloaderPool.Return(downloader)
   if err != nil {
     fmt.Println(err) // TODO
   }
-  fmt.Println("+++++++++++ 111111111111")
   resp, err := downloader.Download(request)
   if err != nil {
     fmt.Println(err) // TODO
   }
-  fmt.Println("+++++++++++ 222222222222")
-  this.respChan <- *resp
+  if resp != nil {
+    fmt.Println("error: ", "response 空")
+    this.respChan <- *resp
+  }
 }
 
 func (this *Scheduler) startAnalyzing() {
