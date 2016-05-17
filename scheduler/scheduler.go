@@ -50,15 +50,26 @@ func (this *Scheduler) startDownloading() {
         break
       }
       go this.download(req)
+      time.Sleep(10 * time.Millisecond)
     }
   }()
 }
 
-func (this *Scheduler) download(req base.Request) {
+func (this *Scheduler) download(request base.Request) {
+  fmt.Println("in download method")
   downloader, err := this.downloaderPool.Take()
+  fmt.Println("+++++++++++ 000000000000")
+  defer this.downloaderPool.Return(downloader)
   if err != nil {
-    //
+    fmt.Println(err) // TODO
   }
+  fmt.Println("+++++++++++ 111111111111")
+  resp, err := downloader.Download(request)
+  if err != nil {
+    fmt.Println(err) // TODO
+  }
+  fmt.Println("+++++++++++ 222222222222")
+  this.respChan <- *resp
 }
 
 func (this *Scheduler) startAnalyzing() {
@@ -74,13 +85,20 @@ func (this *Scheduler) startAnalyzing() {
 }
 
 func (this *Scheduler) analyze(resp base.Response) {
-  fmt.Println(resp.HttpResp().Body)
-  defer resp.HttpResp().Body.Close()
+  fmt.Println("in analyze method")
+  analyzer, err := this.analyzerPool.Take()
+  defer this.analyzerPool.Return(analyzer)
+  if err != nil {
+    fmt.Println(err)// TODO
+  }
+  dataList, errs := analyzer.Analyze(this.respParsers, resp)
+  fmt.Println(len(dataList)) // TODO
+  fmt.Println(len(errs)) // TODO
 }
 
 func (this *Scheduler) schedule() {
   for{
-    remainder := cap(this.reqChan) - len(this.reqChan)
+    remainder := this.downloaderPool.Remainder()
     for remainder > 0 {
       this.reqChan <- this.requestGenerator()
       remainder--

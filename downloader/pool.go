@@ -11,6 +11,7 @@ type DownloaderPool interface {
   Return(downloader Downloader) error
   Total() uint32
   Used() uint32
+  Remainder() uint32
 }
 
 type myDownloaderPool struct {
@@ -52,4 +53,8 @@ func (this *myDownloaderPool) Total() uint32 {
 
 func (this *myDownloaderPool) Used() uint32 {
   return this.pool.Used()
+}
+
+func (this *myDownloaderPool) Remainder() uint32 {
+  return this.Total() - this.Used()
 }

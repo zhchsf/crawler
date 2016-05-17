@@ -65,11 +65,12 @@ func (this *myPool) Return(entity Entity) error {
   if entity == nil || reflect.TypeOf(entity) != this.eType {
     return errors.New("entity对象为nil或者类型错误")
   }
+  this.mutex.Lock()
+  defer this.mutex.Unlock()
+
   if _, ok := this.idContainer[entity.Id()]; !ok {
     return errors.New("归还entity不存在")
   }
-  this.mutex.Lock()
-  defer this.mutex.Unlock()
   this.idContainer[entity.Id()] = true
   this.container <- entity
   return nil
