@@ -67,8 +67,9 @@ func (this *Scheduler) download(request base.Request) {
     fmt.Println(err) // TODO
   }
   if resp != nil {
-    fmt.Println("error: ", "response 空")
     this.respChan <- *resp
+  }else{
+    fmt.Println("error: ", "response 空")
   }
 }
 
