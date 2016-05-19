@@ -3,6 +3,7 @@ package base
 import(
   "net/http"
   "strings"
+  // "fmt"
 )
 
 type Request struct{
@@ -18,7 +19,8 @@ type Request struct{
   // post data "a=1&b=2", url.Values Encode()
   postData string
 
-  header http.Header
+  // header http.Header
+  headers map[string]string
 
   cookies []*http.Cookie
 
@@ -27,8 +29,8 @@ type Request struct{
   // proxy string
 }
 
-func NewRequest(url, respType, method, postData string, header http.Header, cookies []*http.Cookie) *Request {
-  return &Request{url: url, respType: respType, method: method, header: header, cookies: cookies}
+func NewRequest(url, respType, method, postData string, headers map[string]string, cookies []*http.Cookie) *Request {
+  return &Request{url: url, respType: respType, method: method, headers: headers, cookies: cookies}
 }
 
 // func NewGetRequest()
@@ -49,8 +51,8 @@ func (this *Request) HttpReq() *http.Request {
   if err != nil {
     panic(err)
   }
-  if this.header != nil {
-    req.Header = this.header
+  if this.headers != nil {
+    req.Header = generateHeader(this.headers)
   }
   if this.cookies != nil {
     for _, cookie := range this.cookies {
@@ -63,4 +65,12 @@ func (this *Request) HttpReq() *http.Request {
 
 func (this *Request) Valid() bool {
   return this.url != "" && this.method != ""
+}
+
+func generateHeader(headers map[string]string) http.Header {
+  header := http.Header{}
+  for k, v := range headers {
+    header.Add(k, v)
+  }
+  return header
 }

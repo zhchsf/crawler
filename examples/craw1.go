@@ -12,15 +12,20 @@ import(
 )
 
 func httpClientGenerator() *http.Client {
-  return &http.Client{}
+  return &http.Client{
+    Timeout: time.Second,
+  }
 }
 
 func requestGenerator() base.Request {
-  url := "http://office.caishuo.com/topics"
+  url := "http://testing.caishuo.com" // /topics
   respType := "html"
   method := "get"
   postData := ""
-  return *base.NewRequest(url, respType, method, postData, nil, nil)
+  headers := map[string]string{
+    "Referer": "http://www.baidu.com",
+  }
+  return *base.NewRequest(url, respType, method, postData, headers, nil)
 }
 
 // TODO
