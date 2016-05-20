@@ -16,20 +16,25 @@ type Scheduler struct {
   timeInterval time.Duration // schedule时间间隔，可以设置为毫秒级
   respParsers []analyzer.ParseResponse
   requestGenerator genRequest // 生产request func，返回base.Request，外部逻辑自己实现并传入
+  httpClientGenerator genHttpClient // 可以不设置，有默认的generator
 }
 
 func NewScheduler() *Scheduler {
   return &Scheduler{}
 }
 
+// 可以不设置，会使用内置的
+func (this *Scheduler) SetHttpClient(gen genHttpClient) {
+  this.httpClientGenerator = gen
+}
+
 func (this *Scheduler) Start(
   poolConfig base.PoolConfig, 
   chanConfig base.ChanConfig, 
-  httpClientGenerator genHttpClient,
   respParsers []analyzer.ParseResponse,
   timeInterval time.Duration,
   requestGenerator genRequest) {
-  this.downloaderPool = NewDownloaderPool(poolConfig.DownloaderTotal, httpClientGenerator)
+  this.downloaderPool = NewDownloaderPool(poolConfig.DownloaderTotal, this.httpClientGenerator)
   this.analyzerPool = NewAnalyzerPool(poolConfig.AnalyzerTotal)
   this.respChan = make(chan base.Response, chanConfig.RespChanLen)
   this.reqChan = make(chan base.Request, chanConfig.ReqChanLen)

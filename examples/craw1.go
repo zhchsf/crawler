@@ -11,11 +11,11 @@ import(
   "io"
 )
 
-func httpClientGenerator() *http.Client {
-  return &http.Client{
-    Timeout: time.Second,
-  }
-}
+// func httpClientGenerator() *http.Client {
+//   return &http.Client{
+//     Timeout: time.Second,
+//   }
+// }
 
 func requestGenerator() base.Request {
   url := "http://testing.caishuo.com" // /topics
@@ -51,9 +51,10 @@ func getRespParsers() []analyzer.ParseResponse {
 
 func main(){
   sched := scheduler.NewScheduler()
+  // sched.SetHttpClient(httpClientGenerator)
   poolConfig := base.NewPoolConfig(4, 4)
   chanConfig := base.NewChanConfig(4, 4)
   respParsers := getRespParsers()
   timeInterval := 100 * time.Millisecond
-  sched.Start(poolConfig, chanConfig, httpClientGenerator, respParsers, timeInterval, requestGenerator)
+  sched.Start(poolConfig, chanConfig, respParsers, timeInterval, requestGenerator)
 }
